@@ -7,8 +7,9 @@ import ActiveLink from '../link';
 import Walletbar from './Walletbar';
 
 const navigation = [
-  { name: 'Marketplace', href: '/', current: true },
-  { name: 'Create', href: '/nft/create', current: false }
+  { name: 'Home', href: '/', current: true },
+  { name: 'NFT', href: '/NFTs', current: false },
+  { name: 'Impact generator', href: '/ImpactGenerator', current: false }
 ]
 
 function classNames(...classes: string[]) {
@@ -40,7 +41,7 @@ export default function Navbar() {
                 <div className="flex-shrink-0 flex items-center">
                   <img
                     className="hidden lg:block h-10 w-auto"
-                    src="/images/page_logo.png"
+                    src="/images/img.png"
                     alt="Workflow"
                   />
                 </div>
@@ -73,7 +74,7 @@ export default function Navbar() {
                       "Loading..." :
                       account.isInstalled ?
                       network.data :
-                      "Install Web3 Wallet"
+                      "Connect your ledger"
                     }
                   </span>
                 </div>

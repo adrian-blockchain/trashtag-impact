@@ -1,38 +1,16 @@
-
-export type Trait = "attack" | "health" | "speed";
-
-export type NftAttribute = {
-  trait_type: Trait;
-  value: string;
+export interface NFTData {
+  id: number;
+  owner: string;
+  uri: string;
 }
 
-export type NftMeta = {
-  name: string;
-  description: string;
-  image: string;
-  attributes: NftAttribute[];
-}
-
-export type NftCore = {
-  tokenId: number;
-  price: number;
-  creator: string;
-  isListed: boolean
-}
-
-export type Nft = {
-  meta: NftMeta
-} & NftCore
-
-export type FileReq = {
-  bytes: Uint8Array;
-  contentType: string;
-  fileName: string;
-}
-
-export type PinataRes = {
-  IpfsHash: string;
-  PinSize: number;
-  Timestamp: string;
-  isDuplicate: boolean;
+export interface WasteToken{
+  info:NFTData
+  index:number,
+  type: string,
+  exploration: boolean,
+  wasteLoc:GeolocationPosition,
+  wastePict:string,
+  trashcanPict:string,
+  trashcanLoc: GeolocationPosition
 }

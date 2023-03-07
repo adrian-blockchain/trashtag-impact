@@ -4,6 +4,8 @@ import { ethers } from "ethers";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import { NftMarketContract } from "@_types/nftMarketContract";
 
+
+
 const pageReload = () => { window.location.reload(); }
 
 const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
@@ -15,6 +17,20 @@ const setGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
   ethereum.on("chainChanged", pageReload);
   ethereum.on("accountsChanged", handleAccount(ethereum));
 }
+
+const getNFTAvailable = async () =>{
+  const contractJson = require('../../../contracts/abi/TrashtagMarketplace.json');
+  const contractAddress = '0x262742b81464F303F2824C678ed68c44A89Fe8B7';
+  const webProvider = await new ethers.providers.JsonRpcProvider('https://nd-286-883-760.p2pify.com/37a9e81ea19acde3eb37f5e9db138ffa');
+  const signer =new ethers.Wallet('257da6b2c2b1abc70ba9e1bf406aeb0117d540ffaf3b696662e11283713c6d5e', webProvider);
+  const contract = new ethers.Contract(contractAddress, contractJson, signer);
+
+  const tx =await contract.getURIOf(contractAddress);
+  console.log(tx);
+  return tx;
+
+}
+
 
 const removeGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
   ethereum?.removeListener("chainChanged", pageReload);
@@ -72,6 +88,9 @@ export function useHooks() {
 }
 
 export default Web3Provider;
+
+
+//Ledger implementation
 
 
 

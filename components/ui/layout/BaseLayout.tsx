@@ -1,6 +1,7 @@
 
 import { FunctionComponent } from "react";
 import Navbar from "../navbar";
+import Footer from "../../Footer";
 
 const BaseLayout: FunctionComponent = ({children}) => {
 
@@ -12,6 +13,7 @@ const BaseLayout: FunctionComponent = ({children}) => {
           {children}
         </div>
       </div>
+<Footer/>
     </>
   )
 }

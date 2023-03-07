@@ -1,4 +1,6 @@
 import { useHooks } from "@providers/web3"
+import {useState} from "react";
+import WalletConnect from "@walletconnect/browser";
 
 
 export const useAccount = () => {
@@ -9,6 +11,15 @@ export const useAccount = () => {
     account: swrRes
   }
 }
+
+const walletConnector = new WalletConnect({
+  bridge: 'https://bridge.walletconnect.org' // Required
+  // Other options
+
+})
+
+
+
 
 export const useNetwork = () => {
   const hooks = useHooks();

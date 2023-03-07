@@ -1,38 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project. Full process and video lectures how to create the application can be found here: [NFT Marketplace in React, Typescript & Solidity - Full Guide
-](https://academy.eincode.com/courses/nft-marketplace-in-react-js-next-typescript-full-guide)
+#TrashTag Impact - NFT Marketplace
+TrashTag Impact is an NFT marketplace developed in Solidity and Next.js. This marketplace is designed for businesses that want to fulfill their corporate social responsibility commitments. The product takes the form of an NFT that represents a waste collected during the TrashTag challenges performed by the users of the TrashTag App. The company that purchases these NFTs directly participates in the collection of these wastes and supports the initiative to fight environmental pollution.
 
-## Overview
+##Features
+Purchase NFTs representing waste collected during TrashTag challenges
+Participate in the collection of waste and support the initiative to fight environmental pollution
+Subscription-based service for the use of the platform and associated usage advice
+Designed for businesses that are invested in corporate social responsibility
 
-Marketplace has dependencies on multiple technologies.
+##Promotion
+Targeted towards businesses invested in corporate social responsibility
+Promotion via various channels such as corporate events, email campaigns to RSE executives, and a dedicated page on the TrashTag website.
 
-* [Pinata](https://app.pinata.cloud/) - store images, and NFT metadata
-* [Ganache](https://trufflesuite.com/ganache/) - private Blockchain, to run application localy
+##Technology Stack
+Solidity
+Next.js
 
-## To run the app
-1. run `npm install` to install dependencies
+##Getting Started
+Install Solidity and Next.js.
+Clone the repository.
+Run npm install to install the necessary dependencies.
+Run npm run dev to start the development server.
 
-2. In the root folder of the application create a `.env.development` file with following content:
+##Contribution Guidelines
+We welcome contributions to TrashTag Impact. If you are interested in contributing, please follow these guidelines:
 
-```
-NEXT_PUBLIC_NETWORK_ID=5777
-NEXT_PUBLIC_TARGET_CHAIN_ID=1337
-NEXT_PUBLIC_PINATA_DOMAIN=https://gateway.pinata.cloud
+Fork the repository.
+Make your changes in a new branch.
+Submit a pull request explaining your changes.
 
-SECRET_COOKIE_PASSWORD={your custom at least 32 characters long password!}
-
-PINATA_API_KEY={your api key from pinata}
-PINATA_SECRET_API_KEY={your api secret key from pinata}
-```
-* (your api pinata key has to allow `pinFileToIPFS` and `pinJSONToIPFS` rules)
-
-3. Then migrate a contract to Ganache, contract can be found in the `contracts` folder. It's called `NftMarket.sol`
-
-* To migrate the contract run `truffle migrate` in the terminal while Ganache network is setup and running.
-
-* Do not forget to link `trufle-config.js` with Ganache, just go to `config` and click `Add Project`
-
-* `keys.json` must be created if you want to deploy to Ropsten, if not, just remove import of `keys.json` from `trufle-config.js` and also comment out `ropsten` configuration
-
-4. Now everything is setup and you can test out the app.
-
-* Run `npm run dev` in the terminal. App will run at `localhost:3000`
+##License
+This project is licensed under the MIT License.
