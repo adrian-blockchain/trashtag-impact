@@ -2,13 +2,16 @@
 
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
-import { useAccount, useNetwork } from '@hooks/web3';
 import ActiveLink from '../link';
 import Walletbar from './Walletbar';
+import {useEffect, useState} from "react";
+import Web3 from 'web3';
+import {ethers} from "ethers";
+import {getBalanceChanges} from "xrpl";
 
 const navigation = [
   { name: 'Home', href: '/', current: true },
-  { name: 'NFT', href: '/NFTs', current: false },
+  { name: 'Waste', href: '/NFTs', current: false },
   { name: 'Impact generator', href: '/ImpactGenerator', current: false }
 ]
 
@@ -17,8 +20,64 @@ function classNames(...classes: string[]) {
 }
 
 export default function Navbar() {
-  const { account } = useAccount();
-  const { network } = useNetwork();
+
+
+  const [address, setAddress] = useState('');
+  const [balance, setBalance] = useState('0');
+  useEffect(() => {
+    async function connectToWallet() {
+
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          // @ts-ignore
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          const accounts = await signer.getAddress();
+          setAddress(accounts);
+          const balance = await provider.getBalance(accounts);
+          setBalance(ethers.utils.formatEther(balance));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+    connectToWallet();
+  }, []);
+
+
+  const handleConnectFantomTestnet = async () => {
+    try {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: "0xfa2",
+            chainName: "Fantom Testnet",
+            rpcUrls: ["https://rpc.testnet.fantom.network/"],
+            nativeCurrency: {
+              name: "Fantom",
+              symbol: "FTM",
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://explorer.testnet.fantom.network/"],
+          },
+        ],
+      });
+
+      const provider = new ethers.providers.JsonRpcProvider(
+          "https://rpc.testnet.fantom.network/"
+      );
+      await provider.getNetwork();
+      const signer = provider.getSigner();
+      const accounts = await signer.getAddress();
+      setAddress(accounts);
+      const balance = await provider.getBalance(accounts);
+      setBalance(ethers.utils.formatEther(balance));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -66,24 +125,22 @@ export default function Navbar() {
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <div className="text-gray-300 self-center mr-2">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-purple-100 text-purple-800">
-                    <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400" fill="currentColor" viewBox="0 0 8 8">
-                      <circle cx={4} cy={4} r={3} />
-                    </svg>
-                    { network.isLoading ?
-                      "Loading..." :
-                      account.isInstalled ?
-                      network.data :
-                      "Connect your ledger"
-                    }
-                  </span>
+
+                    {address && (
+                        <ul>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-100 text-green-800 mr-5">{address}</span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 mr-5">{balance} FTM</span>
+                        </ul>
+                    )}
+                    {!address && (
+                        <ul>
+                          <button onClick={handleConnectFantomTestnet} className="inline-flex items-center px-2.5 py-2 rounded-md text-sm font-medium bg-green-100 text-green-800 mr-5">
+                            Connect to Fantom Testnet
+                          </button>
+                        </ul>
+                    )}
+
                 </div>
-                <Walletbar
-                  isInstalled={account.isInstalled}
-                  isLoading={account.isLoading}
-                  connect={account.connect}
-                  account={account.data}
-                />
               </div>
             </div>
           </div>

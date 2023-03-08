@@ -3,7 +3,8 @@ import {SetStateAction, useEffect, useState} from "react";
 import {Range} from 'react-range';
 import ImpactData from "@ui/ImpactData";
 import {ethers} from "ethers";
-const contractABI = require('../contracts/abi/TrashtagMarketplace.json');
+import Link from "@ui/link";
+const contractABI = require('../contracts/abi/Trashtag.json');
 
 
 const ImpactGenerator = () => {
@@ -27,42 +28,10 @@ const ImpactGenerator = () => {
     const [cigarettesToBuy, setCigarettesToBuy] = useState(0);
 
 
-    const [values, setValues] = useState([0]);
-    const [max, setMax] = useState(0);
-    const contractAddress = '0x262742b81464F303F2824C678ed68c44A89Fe8B7';
+
+    const contractAddress = '0x0c37cF4B70d059A591D3cD00b880C6bcFFb627f8';
     const provider = new ethers.providers.JsonRpcProvider('https://nd-286-883-760.p2pify.com/37a9e81ea19acde3eb37f5e9db138ffa');
 
-    const handleValuesChange = (newValues: number[]) => {
-        if (newValues[newValues.length-2]>newValues[length-1]) {
-            // If any value is negative, decrement the corresponding state variables
-            if (plastic && plasticToBuy > 0) {
-                setPlasticToBuy(plasticToBuy - newValues[newValues.length - 1]);
-            } else if (paper && paperToBuy > 0) {
-                setPaperToBuy(paperToBuy - newValues[newValues.length - 1]);
-            } else if (aluminium && aluminiumToBuy > 0) {
-                setAluminiumToBuy(aluminiumToBuy - newValues[newValues.length - 1]);
-            } else if (glass && glassToBuy > 0) {
-                setGlassToBuy(glassToBuy - newValues[newValues.length - 1]);
-            } else if (cigarettes && cigarettesToBuy > 0) {
-                setCigarettesToBuy(cigarettesToBuy - newValues[newValues.length - 1]);
-            }
-            return;
-        }
-
-        if (plastic && plasticToBuy + newValues[newValues.length - 1] <= plasticAvailable) {
-            setPlasticToBuy(plasticToBuy + newValues[newValues.length - 1]);
-        } else if (paper && paperToBuy + newValues[newValues.length - 1] <= paperAvailable) {
-            setPaperToBuy(paperToBuy + newValues[newValues.length - 1]);
-        } else if (aluminium && aluminiumToBuy + newValues[newValues.length - 1] <= aluminiumAvailable) {
-            setAluminiumToBuy(aluminiumToBuy + newValues[newValues.length - 1]);
-        } else if (glass && glassToBuy + newValues[newValues.length - 1] <= glassAvailable) {
-            setGlassToBuy(glassToBuy + newValues[newValues.length - 1]);
-        } else if (cigarettes && cigarettesToBuy + newValues[newValues.length - 1] <= cigarettesAvailable) {
-            setCigarettesToBuy(cigarettesToBuy + newValues[newValues.length - 1]);
-        }
-
-        setValues(newValues);
-    };
 
     const allWasteTypesFalse = !plastic && !paper && !aluminium && !glass && !cigarettes;
 
@@ -72,54 +41,114 @@ const ImpactGenerator = () => {
             const contract = new ethers.Contract(contractAddress, contractABI, provider);
             const nftData = await contract.getURIOf(contractAddress);
             console.log(nftData);
-
             setPlasticAvailable(nftData[0].length);
             setGlassAvailable(nftData[1].length);
             setPaperAvailable(nftData[2].length);
             setCigarettesAvailable(nftData[3].length);
             setAluminiumAvailable(nftData[4].length);
-
-
-
-
-
         }
-
      fetchNFT();
     })
 
+    async function buyTokens() {
+        if(window.ethereum){
+            await window.ethereum.request({ method: "eth_requestAccounts" });
 
-    const handleClick = (wasteType: any) => {
+
+
+            // @ts-ignore
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            window.ethereum.enable()
+
+            await provider.send('eth_requestAccounts', []); // <- this promps user to connect metamask
+            const signer = provider.getSigner();
+            const accounts= await signer.getAddress();
+
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            const price = cigarettesToBuy+plasticToBuy+glassToBuy+paperToBuy+aluminiumToBuy;
+            //const gweiValue = ethers.utils.;
+            alert(accounts);
+
+            const overrides = {
+                gasLimit: 900000000,
+                value:ethers.utils.parseEther(price.toString())
+            };
+
+            const tx = await contract.buyTokens(
+                plasticToBuy,
+                glassToBuy,
+                paperToBuy,
+                cigarettesToBuy,
+                aluminiumToBuy,
+                accounts,
+                overrides
+            );
+
+            await tx.wait();
+        }
+
+
+    }
+
+
+    const handleClick = (wasteType: string) => {
         switch (wasteType) {
             case "plastic":
-                setMax(max+plasticAvailable)
-                setPlastic(!plastic);
+                if (plasticToBuy === plasticAvailable) {
+                    setPlasticToBuy(0);
+                    setPlastic(!plastic);
 
+                } else {
+                    setPlasticToBuy(plasticAvailable);
+                    setPlastic(!plastic);
+                }
                 break;
             case "paper":
-                setMax(max+paperAvailable)
+                if (paperToBuy === paperAvailable) {
+                    setPaperToBuy(0);
+                    setPaper(!paper);
 
-                setPaper(!paper);
+                } else {
+                    setPaperToBuy(paperAvailable);
+                    setPaper(!paper);
+                }
                 break;
             case "aluminium":
-                setMax(max+aluminiumAvailable)
+                if (aluminiumToBuy === aluminiumAvailable) {
+                    setAluminiumToBuy(0);
+                    setAluminium(!aluminium);
 
-                setAluminium(!aluminium);
+                } else {
+                    setAluminiumToBuy(aluminiumAvailable);
+                    setAluminium(!aluminium);
+                }
                 break;
             case "glass":
-                setMax(max+glassAvailable)
+                if (glassToBuy === glassAvailable) {
+                    setGlassToBuy(0);
+                    setGlass(!glass);
 
-                setGlass(!glass);
+                } else {
+                    setGlassToBuy(glassAvailable);
+                    setGlass(!glass);
+                }
                 break;
             case "cigarettes":
-                setMax(max+cigarettesAvailable)
+                if (cigarettesToBuy === cigarettesAvailable) {
+                    setCigarettesToBuy(0);
+                    setCigarettes(!cigarettes);
 
-                setCigarettes(!cigarettes);
+                } else {
+                    setCigarettesToBuy(cigarettesAvailable);
+                    setCigarettes(!cigarettes);
+                }
                 break;
             default:
                 break;
         }
     };
+
 
     return (
         <BaseLayout>
@@ -175,88 +204,44 @@ Invest in the global waste cleaning                    </h3>
                     <div className="flex space-x-2">
 
                         {allWasteTypesFalse ? null :
-                            <div className="flex w-screen space-x-5">
-                                <div className="col-end-2 w-1/2 bg-gray-200 h-80 mt-auto mb-auto p-5 rounded-md justify-center items-center">
-                                    <div className="flex justify-center items-center mb-10">
-                                        <Range
-                                            values={values}
-                                            step={1}
-                                            min={0}
-                                            max={max}
-                                            onChange={handleValuesChange}
-                                            renderTrack={({props, children}) => (
-                                                <div
-                                                    {...props}
-                                                    style={{
-                                                        ...props.style,
-                                                        height: '6px',
-                                                        width: '100%',
-                                                        backgroundColor: '#ddd',
-                                                        borderRadius: '4px',
-                                                    }}
-                                                >
-                                                    {children}
-                                                </div>
-                                            )}
-                                            renderThumb={({props}) => (
-                                                <div
-                                                    {...props}
-                                                    style={{
-                                                        ...props.style,
-                                                        height: '16px',
-                                                        width: '16px',
-                                                        backgroundColor: '#aaa',
-                                                        borderRadius: '50%',
-                                                        display: 'flex',
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center',
-                                                    }}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            height: '8px',
-                                                            width: '8px',
-                                                            backgroundColor: '#fff',
-                                                            borderRadius: '50%',
-                                                        }}
-                                                    />
-                                                </div>
-                                            )}
-                                        />
-                                        <p style={{margin: '10px', fontSize: '18px'}}>{values[0]}</p>
-
-                                    </div>
-                                    <div className="justify-center items-center">
+                            <div className="flex w-screen space-x-5 justify-center items-center">
+                                <div className="col-end-2 w-1/2 bg-gray-200 h-80 mt-auto mb-auto p-5 rounded-md ">
+                                    <div className="justify-center items-center mt-auto ">
                                         <ImpactData plastic={plasticToBuy} paper={paperToBuy} aluminium={aluminiumToBuy} glass={glassToBuy} cigarettes={cigarettesToBuy}/>
-
+<span className="text-gray-500 font-light text-xs">All Impact trash calculations are based on the BEE platform developed by Citeo. The BEE platform provides reliable data on the environmental impact of waste management, including greenhouse gas emissions, energy consumption, and waste volume. By using the BEE platform, Impact trash ensures that its calculations are accurate and up-to-date, providing users with valuable information on the environmental impact of waste management practices.</span>
                                     </div>
                                 </div>
 
                                 <div className="flex flex-col space-y-2 h-80 bg-gray-200 w-1/2 justify-center rounded-md p-5">
                                     {!plastic ? null: <div className="flex items-center ml-20 ">
                                         <div className="h-3 w-3 rounded-full bg-blue-500 mr-2"></div>
-                                        <span className="text-gray-700">Plastic   {plasticToBuy}/{plasticAvailable}</span>
+                                        <span className="text-gray-700">Plastic   <span className="text-gray-500">{plasticToBuy}</span></span>
                                     </div>}
                                     {!paper ? null:  <div className="flex items-center ml-20">
                                         <div className="h-3 w-3 rounded-full bg-green-500 mr-2"></div>
-                                        <span className="text-gray-700">Paper {paperToBuy}/{paperAvailable}</span>
+                                        <span className="text-gray-700">Paper <span className="text-gray-500">{paperToBuy}</span></span>
                                     </div>}
                                     {!aluminium ? null:<div className="flex items-center ml-20">
                                         <div className="h-3 w-3 rounded-full bg-red-500 mr-2"></div>
-                                        <span className="text-gray-700">Aluminium {aluminiumToBuy}/{aluminiumAvailable} </span>
+                                        <span className="text-gray-700">Aluminium <span className="text-gray-500">{aluminiumToBuy}</span></span>
                                     </div>}
                                     {!glass ? null:<div className="flex items-center ml-20">
                                         <div className="h-3 w-3 rounded-full bg-yellow-500 mr-2"></div>
-                                        <span className="text-gray-700">Glass {glassToBuy}/{glassAvailable}</span>
+                                        <span className="text-gray-700">Glass <span className="text-gray-500">  {glassToBuy}</span></span>
                                     </div>}
                                     {!cigarettes ? null:<div className="flex items-center ml-20">
                                         <div className="h-3 w-3 rounded-full bg-indigo-500 mr-2"></div>
-                                        <span className="text-gray-700">Cigarettes {cigarettesToBuy}/{cigarettesAvailable}</span>
+                                        <span className="text-gray-700">Cigarettes <span className="text-gray-500">{cigarettesToBuy}</span></span>
                                     </div>}
-                                    <a href="#_"
+                                    <span className="text-gray-700 ml-auto mr-auto">Tokens to pay {cigarettesToBuy+plasticToBuy+glassToBuy+paperToBuy+aluminiumToBuy} $FTM </span>
+
+                                    <button onClick={()=>buyTokens()}
                                        className="flex items-center justify-center px-10 w-1/4 py-5 mt-50 ml-auto mr-auto text-2xl font-medium text-white bg-green-500 rounded-full hover:bg-green-400 lg:mt-0 tails-selected-element"
                                        data-primary="green-500" data-rounded="rounded-full"
-                                       contentEditable="true">Purchase</a>
+                                       contentEditable="true">Purchase</button>
+                                    <Link href="https://testnet.ftmscan.com/address/0x0c37cF4B70d059A591D3cD00b880C6bcFFb627f8"   activeClass="activeClass">
+                                        <a target="_blank" className="text-blue-700 ml-auto mr-auto">FTM block explorer</a>
+                                    </Link>
                                 </div>
 
                             </div>
@@ -265,6 +250,8 @@ Invest in the global waste cleaning                    </h3>
 
                     </div>
                 </div>
+
+
 
 
 

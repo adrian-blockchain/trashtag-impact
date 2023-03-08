@@ -1,5 +1,4 @@
 
-import { setupHooks, Web3Hooks } from "@hooks/web3/setupHooks";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import { Web3Dependencies } from "@_types/hooks";
 import { Contract, ethers, providers } from "ethers";
@@ -16,7 +15,6 @@ type Nullable<T> = {
 
 export type Web3State = {
   isLoading: boolean; // true while loading web3State
-  hooks: Web3Hooks;
 } & Nullable<Web3Dependencies>
 
 
@@ -26,7 +24,6 @@ export const createDefaultState = () => {
     provider: null,
     contract: null,
     isLoading: true,
-    hooks: setupHooks({isLoading: true} as any)
   }
 }
 
@@ -38,7 +35,6 @@ export const createWeb3State = ({
     provider,
     contract,
     isLoading,
-    hooks: setupHooks({ethereum, provider, contract, isLoading})
   }
 }
 
